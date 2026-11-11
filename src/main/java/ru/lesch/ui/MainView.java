@@ -4,8 +4,18 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import ru.lesch.model.GradeData;
 import ru.lesch.model.Topic;
 import ru.lesch.service.ContentLoader;
@@ -87,7 +97,15 @@ tasksList.getItems().clear();
 videosList.getItems().clear();
 return;
 }
-int grade = Integer.parseInt(v.replaceAll("\D+", ""));
+
+StringBuilder digits = new StringBuilder();
+for (int i = 0; i < v.length(); i++) {
+char c = v.charAt(i);
+if (c >= '0' && c <= '9') {
+digits.append(c);
+}
+}
+int grade = Integer.parseInt(digits.toString());
 GradeData data = ContentLoader.load(grade);
 
 tasksList.setItems(FXCollections.observableArrayList(data.topics));
@@ -104,7 +122,7 @@ videosList.setVisible(true);
 private void openTest(Topic topic) {
 if (topic.questions == null || topic.questions.isEmpty()) {
 Alert a = new Alert(Alert.AlertType.INFORMATION,
-"Тест по теме «" + topic.title + "» скоро появится.", ButtonType.OK);
+"Тест по теме " + topic.title + " скоро появится.", ButtonType.OK);
 a.setHeaderText(null);
 a.showAndWait();
 return;
