@@ -1,17 +1,44 @@
-Как запустить LESH
+# Как запустить LESH
 
-1. Dev-запуск:
+## 1. Разработка
+
+Требуются JDK 21 и Maven 3.9+.
+
+```bash
 mvn clean javafx:run
-2. Сборка JAR:
-mvn -q -DskipTests package
-Результат: target/LESH-1.0.0.jar (shaded).
-3. Запуск JAR:
-java -jar target/LESH-1.0.0.jar
-Внимание: для standalone-jar на JavaFX может понадобиться
-установить JavaFX runtime отдельно и указать --module-path / --add-modules.
-Проще всего — mvn javafx:run.
-4. CI-релизы:
-Пуш в main/master → GitHub Actions создаёт тег гг.мм.дд.час.мин (Москва)
-и публикует Release с JAR-артефактом.
-5. Добавление тем и вопросов:
-Редактируй src/main/resources/content/gradeN.json. Перезапусти приложение.
+```
+
+## 2. Сборка
+
+```bash
+mvn clean package
+```
+
+Результат:
+
+```text
+target/LESH-1.0.1.jar
+```
+
+## 3. Запуск собранного JAR
+
+```bash
+java -jar target/LESH-1.0.1.jar
+```
+
+Главным классом JAR является `ru.lesch.Launcher`, а не класс, наследующийся от JavaFX `Application`.
+
+## 4. Если окно не появляется
+
+Проверьте:
+
+```bash
+java -version
+mvn -version
+```
+
+Нужен Java 21. Если используется запуск из IDE, импортируйте проект именно как Maven-проект и запускайте `ru.lesch.Launcher` либо цель `javafx:run`.
+
+## 5. Контент
+
+Материалы лежат в `src/main/resources/content/gradeN.json`. При загрузке приложение проверяет базовую структуру вопросов и выдаёт понятное сообщение вместо падения обработчика интерфейса.
