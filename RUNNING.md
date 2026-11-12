@@ -1,6 +1,6 @@
-# Как запустить LESH
+# Как запустить LESH 1.1.0
 
-## 1. Разработка
+## Из исходников
 
 Требуются JDK 21 и Maven 3.9+.
 
@@ -8,37 +8,46 @@
 mvn clean javafx:run
 ```
 
-## 2. Сборка
+## Сборка на своей ОС
 
 ```bash
 mvn clean package
+java -jar target/LESH-1.1.0.jar
 ```
 
-Результат:
+Главным классом JAR является `ru.lesch.Launcher`.
 
-```text
-target/LESH-1.0.1.jar
-```
+## GitHub Actions / Release
 
-## 3. Запуск собранного JAR
+Workflow собирает приложение отдельно на трёх системах:
+
+- Windows → `LESH-windows.jar`;
+- Linux → `LESH-linux.jar`;
+- macOS → `LESH-macos.jar`.
+
+Запускайте JAR, соответствующий своей операционной системе:
 
 ```bash
-java -jar target/LESH-1.0.1.jar
+java -jar LESH-linux.jar
 ```
 
-Главным классом JAR является `ru.lesch.Launcher`, а не класс, наследующийся от JavaFX `Application`.
+На Windows аналогично:
 
-## 4. Если окно не появляется
+```bat
+java -jar LESH-windows.jar
+```
 
-Проверьте:
+## Если сборка не запускается
+
+Проверьте версии:
 
 ```bash
 java -version
 mvn -version
 ```
 
-Нужен Java 21. Если используется запуск из IDE, импортируйте проект именно как Maven-проект и запускайте `ru.lesch.Launcher` либо цель `javafx:run`.
+Нужна Java 21. Проект следует импортировать в IDE как Maven-проект.
 
-## 5. Контент
+## Контент
 
-Материалы лежат в `src/main/resources/content/gradeN.json`. При загрузке приложение проверяет базовую структуру вопросов и выдаёт понятное сообщение вместо падения обработчика интерфейса.
+Учебные материалы находятся в `src/main/resources/content/grade5.json` … `grade8.json`. При загрузке приложение проверяет структуру вопросов. Полный охват тем описан в `CONTENT_COVERAGE.md`.

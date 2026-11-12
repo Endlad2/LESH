@@ -9,8 +9,28 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  meta:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.ver.outputs.tag }}
+    steps:
+      - id: ver
+        shell: bash
+        run: echo "tag=$(date -u +%y.%m.%d.%H.%M)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: meta
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            name: linux
+          - os: windows-latest
+            name: windows
+          - os: macos-latest
+            name: macos
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -20,27 +40,38 @@ jobs:
           java-version: "21"
           cache: maven
 
-      - id: ver
-        shell: bash
-        run: echo "tag=$(date -u +%y.%m.%d.%H.%M)" >> "$GITHUB_OUTPUT"
-
-      - name: Build cross-platform fat JAR
+      - name: Build platform JAR
         run: mvn -B -DskipTests clean package
 
-      - name: Prepare release artifact
+      - name: Rename artifact
         shell: bash
-        run: |
-          test -f target/LESH-1.0.1.jar
-          mkdir -p dist
-          cp target/LESH-1.0.1.jar "dist/LESH-${{ steps.ver.outputs.tag }}.jar"
-          ls -lh dist
+        run: cp target/LESH-1.1.0.jar "LESH-${{ matrix.name }}.jar"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lesh-${{ matrix.name }}
+          path: LESH-${{ matrix.name }}.jar
+          if-no-files-found: error
+
+  release:
+    needs: [meta, build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: lesh-*
+          path: dist
+          merge-multiple: true
+
+      - name: Show artifacts
+        run: ls -lh dist
 
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.ver.outputs.tag }}
-          name: LESH ${{ steps.ver.outputs.tag }}
-          body: Release ${{ steps.ver.outputs.tag }} from ${{ github.sha }}
-          files: dist/LESH-${{ steps.ver.outputs.tag }}.jar
+          tag_name: ${{ needs.meta.outputs.tag }}
+          name: LESH ${{ needs.meta.outputs.tag }}
+          body: Platform builds of LESH from ${{ github.sha }}
+          files: dist/*.jar
           draft: false
           prerelease: false
         env:

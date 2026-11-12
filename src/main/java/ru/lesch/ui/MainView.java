@@ -147,8 +147,8 @@ public class MainView extends BorderPane {
     }
 
     private void configureLists() {
-        tasksList.setCellFactory(lv -> new TopicCell("Тест"));
-        videosList.setCellFactory(lv -> new TopicCell("Видео"));
+        tasksList.setCellFactory(lv -> new TopicCell(true));
+        videosList.setCellFactory(lv -> new TopicCell(false));
         tasksList.setPlaceholder(new Label("Для этого класса пока нет тем"));
         videosList.setPlaceholder(new Label("Для этого класса пока нет тем"));
 
@@ -206,7 +206,10 @@ public class MainView extends BorderPane {
             videosList.setVisible(true);
 
             String subject = data.subject == null || data.subject.isBlank() ? "Материалы" : data.subject;
-            statusLabel.setText(subject + " • " + grade + " класс • тем: " + topics.size());
+            int questionCount = topics.stream()
+                    .mapToInt(topic -> topic.questions == null ? 0 : topic.questions.size())
+                    .sum();
+            statusLabel.setText(subject + " • " + grade + " класс • тем: " + topics.size() + " • заданий: " + questionCount);
         } catch (RuntimeException ex) {
             showEmptyState();
             statusLabel.setText("Не удалось загрузить материалы для " + grade + " класса");
@@ -267,10 +270,10 @@ public class MainView extends BorderPane {
     }
 
     private static class TopicCell extends ListCell<Topic> {
-        private final String badgeText;
+        private final boolean showQuestionCount;
 
-        TopicCell(String badgeText) {
-            this.badgeText = badgeText;
+        TopicCell(boolean showQuestionCount) {
+            this.showQuestionCount = showQuestionCount;
         }
 
         @Override
@@ -294,7 +297,8 @@ public class MainView extends BorderPane {
             VBox text = new VBox(4, title, desc);
             HBox.setHgrow(text, Priority.ALWAYS);
 
-            Label badge = new Label(badgeText);
+            int count = topic.questions == null ? 0 : topic.questions.size();
+            Label badge = new Label(showQuestionCount ? count + " заданий" : "Видео");
             badge.getStyleClass().add("topic-badge");
 
             HBox card = new HBox(14, text, badge);

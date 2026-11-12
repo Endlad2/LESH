@@ -2,8 +2,8 @@
 setlocal
 cd /d "%~dp0"
 
-if exist "target\LESH-1.0.1.jar" (
-    java -jar "target\LESH-1.0.1.jar"
+if exist "target\LESH-1.1.0.jar" (
+    java -jar "target\LESH-1.1.0.jar"
     goto :eof
 )
 

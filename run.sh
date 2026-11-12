@@ -2,8 +2,8 @@
 set -eu
 cd "$(dirname "$0")"
 
-if [ -f "target/LESH-1.0.1.jar" ]; then
-  exec java -jar "target/LESH-1.0.1.jar"
+if [ -f "target/LESH-1.1.0.jar" ]; then
+  exec java -jar "target/LESH-1.1.0.jar"
 fi
 
 if ! command -v mvn >/dev/null 2>&1; then
